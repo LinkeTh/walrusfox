@@ -1,0 +1,12 @@
+*/__pycache__
+*.pyc
+*.log
+*/*.log
+dist/*
+pywalfox.egg-info/*
+build/*
+.coverage
+/target
+.idea
+.junie
+Cargo.lock
