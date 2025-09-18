@@ -133,7 +133,10 @@ impl<'a> Server<'a> {
                                     continue;
                                 }
                                 if let Err(e) = c.write_all(b"\n") {
-                                    warn!("broadcast newline write error to client {}: {}", client_id, e);
+                                    warn!(
+                                        "broadcast newline write error to client {}: {}",
+                                        client_id, e
+                                    );
                                     continue;
                                 }
                                 if let Err(e) = c.flush() {

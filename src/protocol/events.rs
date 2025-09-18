@@ -8,7 +8,7 @@ pub(crate) enum BrowserAction {
 
 const ACTN_VERSION_STR: &str = "debug:version";
 const ACTN_COLORS_STR: &str = "action:colors";
-const ACTN_THEME_MODE_STR: &str = "action:theme:mode";
+const ACTN_THEME_MODE_STR: &str = "theme:mode";
 const ACTN_INVALID_STR: &str = "action:invalid";
 const CMD_UPDATE_STR: &str = "update";
 const CMD_AUTO_STR: &str = "auto";
