@@ -8,24 +8,25 @@ use tracing::warn;
 
 pub const HOST_NAME: &str = "pywalfox"; // keep the same host name used by the Python implementation
 pub const ALLOWED_EXTENSION: &str = "pywalfox@frewacom.org"; // Firefox add-on id
+pub const MAX_MSG_LEN: usize = 64 * 1024; // 64 KiB
 
 #[derive(Debug, Default, Deserialize, Clone)]
 pub struct Config {
-    pub socket_path: PathBuf,
+    pub socket_file: PathBuf,
     pub log_file: PathBuf,
 }
 
 impl Config {
     pub fn new() -> Self {
-        let socket_path = Self::socket_path();
+        let socket_file = Self::socket_file_path();
         let log_file = Self::log_file_path();
         Self {
-            socket_path,
+            socket_file,
             log_file,
         }
     }
 
-    fn socket_path() -> PathBuf {
+    fn socket_file_path() -> PathBuf {
         if let Ok(p) = env::var("WALRUSFOX_SOCKET") {
             return PathBuf::from(p);
         }

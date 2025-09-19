@@ -14,21 +14,20 @@ fn main() {
 
     match Cli::try_parse() {
         Ok(cli) => {
-            if let Err(e) = real_main(cli, config) {
+            if let Err(e) = run(cli, config) {
                 error!("error: {e}");
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }
         }
         Err(e) => {
-            error!("error: {e}");
-            eprintln!("error: {e}");
+            eprintln!("{e}");
             std::process::exit(1);
         }
     }
 }
 
-fn real_main(cli: Cli, config: Config) -> Result<()> {
+fn run(cli: Cli, config: Config) -> Result<()> {
     match cli.command {
         Commands::Install => installer::Installer::new().install()?,
         Commands::Uninstall => installer::Installer::new().uninstall()?,

@@ -1,3 +1,4 @@
+use crate::config::MAX_MSG_LEN;
 use crate::protocol::events::BrowserAction;
 use crate::utils::themes;
 use anyhow::{Context, Result};
@@ -33,8 +34,6 @@ pub fn read_message<T: DeserializeOwned + std::fmt::Debug>() -> Result<Option<T>
         return Ok(None);
     }
     let len = u32::from_le_bytes(len_buf) as usize;
-    // Bound the maximum message length to avoid excessive allocation
-    const MAX_MSG_LEN: usize = 64 * 1024; // 64 KiB
     if len == 0 || len > MAX_MSG_LEN {
         anyhow::bail!(
             "native messaging: invalid length {} (max {})",

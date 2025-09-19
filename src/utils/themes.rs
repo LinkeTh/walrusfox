@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
@@ -15,7 +15,7 @@ pub fn read_colors() -> Result<(Vec<String>, Option<String>)> {
     let data = match fs::read_to_string(&path) {
         Ok(d) => d,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            anyhow::bail!("color definition not found at {}", path.display());
+            bail!("color definition not found at {}", path.display());
         }
         Err(e) => return Err(e).with_context(|| format!("reading {}", path.display())),
     };

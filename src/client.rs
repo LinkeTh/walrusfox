@@ -32,7 +32,7 @@ impl<'a> Client<'a> {
     }
 
     pub fn health(&self) -> Result<()> {
-        let socket = self.config.socket_path.clone();
+        let socket = self.config.socket_file.clone();
         match UnixStream::connect(&socket) {
             Ok(_) => {
                 println!("Server is reachable at {}", socket.display());
@@ -49,7 +49,7 @@ impl<'a> Client<'a> {
         println!("Version: {}", env!("CARGO_PKG_VERSION"));
 
         // Socket
-        let socket = self.config.socket_path.clone();
+        let socket = self.config.socket_file.clone();
         println!("Socket path: {}", socket.display());
         if socket.exists() {
             println!("Socket exists: yes");
@@ -108,7 +108,7 @@ impl<'a> Client<'a> {
     }
 
     fn send_command(&self, cmd: &str) -> Result<()> {
-        let socket = self.config.socket_path.clone();
+        let socket = self.config.socket_file.clone();
         let mut stream = match UnixStream::connect(&socket) {
             Ok(s) => s,
             Err(e) => {

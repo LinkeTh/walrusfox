@@ -29,7 +29,7 @@ fn main() {
     }
 
     fn maybe_spawn_server(config: &Config) {
-        if UnixStream::connect(&config.socket_path).is_ok() {
+        if UnixStream::connect(&config.socket_file).is_ok() {
             return; // server already up
         }
 

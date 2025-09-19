@@ -1,8 +1,3 @@
-//! Bridge between the Unix socket server and the browser native-messaging.
-//! - Listens for commands from the local Unix socket and forwards responses to the browser.
-//! - Answers browser-originated requests on stdin/stdout (native messaging protocol).
-//! - Gracefully shuts down when stdin closes or on fatal socket errors.
-
 use crate::config::Config;
 use crate::protocol::events::{BrowserAction, SocketCommand};
 use crate::protocol::native_messaging::{
@@ -31,7 +26,7 @@ impl<'a> Bridge<'a> {
     pub fn run(&self) -> Result<()> {
         let shutdown = Arc::new(AtomicBool::new(false));
         let shutdown_socket = shutdown.clone();
-        let socket = self.config.socket_path.clone();
+        let socket = self.config.socket_file.clone();
 
         let _ = thread::Builder::new()
             .name("walrusfox-bridge-socket".to_string())
