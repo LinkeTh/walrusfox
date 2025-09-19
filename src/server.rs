@@ -23,7 +23,12 @@ impl<'a> Server<'a> {
 
     pub fn init(&self) -> anyhow::Result<()> {
         let path = self.config.socket_path.clone();
-
+        if path.exists() {
+            // Try to connect; if connect fails, it’s stale and safe to remove
+            if UnixStream::connect(&path).is_err() {
+                let _ = remove_file(&path);
+            }
+        }
         let listener = UnixListener::bind(&path)?;
         if let Err(e) = set_permissions(&path, Permissions::from_mode(0o600)) {
             warn!("Failed to set socket permissions to 0600: {}", e);

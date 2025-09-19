@@ -27,12 +27,10 @@ impl Installer {
     }
 
     pub fn install(&self) -> Result<()> {
-        Self::install_systemd_user_unit()?;
         Self::install_manifest()
     }
 
     pub fn uninstall(&self) -> Result<()> {
-        Self::uninstall_systemd_user_unit()?;
         Self::uninstall_manifest()
     }
 
@@ -84,7 +82,6 @@ impl Installer {
     }
 
     fn mozilla_native_hosts_dir_user() -> PathBuf {
-        // ~/.mozilla/native-messaging-hosts/
         let home = BaseDirs::new()
             .expect("xdg base dirs")
             .home_dir()
@@ -94,52 +91,5 @@ impl Installer {
 
     fn manifest_path_user() -> PathBuf {
         Self::mozilla_native_hosts_dir_user().join(format!("{}.json", HOST_NAME))
-    }
-
-    fn systemd_user_unit_dir() -> PathBuf {
-        let base = BaseDirs::new().expect("xdg base").home_dir().to_path_buf();
-        base.join(".config").join("systemd").join("user")
-    }
-
-    fn systemd_unit_path() -> PathBuf {
-        Self::systemd_user_unit_dir().join("walrusfox.service")
-    }
-
-    fn install_systemd_user_unit() -> Result<()> {
-        let bin = std::env::current_exe().context("resolve current exe path")?;
-        let dir = Self::systemd_user_unit_dir();
-        fs::create_dir_all(&dir).with_context(|| format!("creating {}", dir.display()))?;
-        let unit_path = Self::systemd_unit_path();
-        let content = format!(
-            r#"[Unit]
-Description=WalrusFox Native Host
-After=default.target
-
-[Service]
-ExecStartPre=/usr/bin/rm -f /run/user/1000/walrusfox/walrusfox.sock
-ExecStart={} start
-ExecStopPost=/usr/bin/rm -f /run/user/1000/walrusfox/walrusfox.sock
-
-[Install]
-WantedBy=default.target
-            "#,
-            bin.display()
-        );
-        // Restart=on-failure
-        fs::write(&unit_path, content)
-            .with_context(|| format!("writing {}", unit_path.display()))?;
-        println!("Installed systemd user unit at {}", unit_path.display());
-        println!("Hint: enable it with: systemctl --user enable --now walrusfox.service");
-        Ok(())
-    }
-
-    fn uninstall_systemd_user_unit() -> Result<()> {
-        let unit_path = Self::systemd_unit_path();
-        if unit_path.exists() {
-            fs::remove_file(&unit_path)
-                .with_context(|| format!("removing {}", unit_path.display()))?;
-            println!("Removed systemd user unit {}", unit_path.display());
-        }
-        Ok(())
     }
 }
