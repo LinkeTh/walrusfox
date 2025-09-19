@@ -12,15 +12,13 @@ pub struct Cli {
 }
 
 #[derive(Subcommand, Debug)]
-pub(crate) enum Commands {
+pub enum Commands {
     /// Install the Firefox native messaging manifest (user scope)
     Install,
     /// Uninstall the Firefox native messaging manifest (user scope)
     Uninstall,
     /// Start the native host in the foreground (stdin/stdout)
     Start,
-    /// Connect
-    Connect,
     /// Trigger an update (refetch colors)
     Update,
     /// Set theme mode to dark

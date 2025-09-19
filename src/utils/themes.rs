@@ -10,7 +10,7 @@ struct ColorFile {
     wallpaper: Option<String>,
 }
 
-pub(crate) fn read_colors() -> Result<(Vec<String>, Option<String>)> {
+pub fn read_colors() -> Result<(Vec<String>, Option<String>)> {
     let path = colors_path();
     let data = match fs::read_to_string(&path) {
         Ok(d) => d,

@@ -16,11 +16,11 @@ Original project: https://github.com/Frewacom/pywalfox
 
 ## High-level overview
 
-Components in this repo:
+Components in this repo (split binaries):
 
-- Native messaging host (stdin/stdout) that talks to Firefox.
-- Local Unix socket server to accept control commands.
-- CLI utilities to install/uninstall the Firefox native host manifest and to send commands to the running server.
+- walrusfox-ext: Firefox/Thunderbird native messaging host (stdin/stdout) that talks to the browser.
+- walrusfox: CLI and local Unix socket server to accept control commands.
+- Shared library code under src/lib.rs used by both binaries.
 
 Data flow:
 
@@ -43,27 +43,38 @@ Build:
 
 - cargo build --release
 
+Binaries produced:
+
+- target/release/walrusfox — CLI and local server
+- target/release/walrusfox-ext — Native messaging host (launched by Firefox/Thunderbird)
+
 Run (common tasks):
 
-- Start the socket server:
-    - cargo run -- start
-- Start the native host process that connects Firefox to the local socket (typically launched by Firefox via the manifest):
-    - cargo run -- connect
+CLI/server binary (walrusfox):
+
+- Start the socket server (foreground):
+    - cargo run --bin walrusfox -- start
 - Install the Firefox native messaging manifest (user scope):
-    - cargo run -- install
+    - cargo run --bin walrusfox -- install
 - Uninstall the manifest and helper files:
-    - cargo run -- uninstall
-- Trigger a refresh of colors (broadcast to connected clients; the extension client will forward to Firefox):
-    - cargo run -- update
+    - cargo run --bin walrusfox -- uninstall
+- Trigger a refresh of colors (broadcast to connected clients; the extension host will forward to Firefox):
+    - cargo run --bin walrusfox -- update
 - Set theme mode to dark/light/auto:
-    - cargo run -- dark
-    - cargo run -- light
-    - cargo run -- auto
+    - cargo run --bin walrusfox -- dark
+    - cargo run --bin walrusfox -- light
+    - cargo run --bin walrusfox -- auto
 - Connectivity and diagnostics:
-    - cargo run -- health
-    - cargo run -- diagnose
+    - cargo run --bin walrusfox -- health
+    - cargo run --bin walrusfox -- diagnose
 - Print the Firefox native messaging manifest JSON (no file changes):
-    - cargo run -- print-manifest
+    - cargo run --bin walrusfox -- print-manifest
+
+Host binary (walrusfox-ext):
+
+- Normally, Firefox starts this via the native messaging manifest; you do not run it manually.
+- For a quick native messaging smoke test from a terminal:
+    - printf '\x13\x00\x00\x00{"action":"debug:version"}' | cargo run --quiet --bin walrusfox-ext | hexdump -C
 
 Notes:
 
@@ -71,7 +82,7 @@ Notes:
   so CLI commands can be delivered to the extension client.
 - `install` creates the following in your home directory:
     - Native messaging manifest at `~/.mozilla/native-messaging-hosts/pywalfox.json` (host name kept for compatibility).
-    - Small launcher script `~/.mozilla/native-messaging-hosts/walrusfox.sh` that runs `walrusfox connect`.
+    - A small launcher script at `~/.mozilla/native-messaging-hosts/walrusfox.sh` used as the manifest's entry point.
     - A systemd user unit at `~/.config/systemd/user/walrusfox.service` that runs the server; enable it with
       `systemctl --user enable --now walrusfox.service`.
 
@@ -102,7 +113,7 @@ Example successful colors response:
 
 Example theme mode response (when a CLI command is received via the socket):
 {
-"action": "action:theme:mode",
+"action": "theme:mode",
 "success": true,
 "error": null,
 "data": "dark"
@@ -110,7 +121,9 @@ Example theme mode response (when a CLI command is received via the socket):
 
 ## Modules overview
 
-- src/main.rs: Entry point; parses CLI with clap and dispatches to subcommands. Also initializes file-based tracing.
+- src/bin/walrusfox.rs: CLI entry point; parses commands with clap and dispatches to subcommands. Initializes tracing.
+- src/bin/walrusfox_ext.rs: Minimal native messaging host entry point for Firefox/Thunderbird (no clap).
+- src/lib.rs: Shared library exposing modules used by both binaries.
 - src/bridge.rs: Connects native messaging to the Unix socket; handles browser requests and socket commands.
 - src/client.rs: CLI client for sending single commands to the socket, plus health/diagnose helpers.
 - src/server.rs: Unix domain socket server that broadcasts line-based commands to all connected clients except the sender.
@@ -120,6 +133,7 @@ Example theme mode response (when a CLI command is received via the socket):
 - src/protocol/native_messaging.rs: Helpers to encode/decode Native Messaging frames and build responses.
 - src/utils/cli.rs: clap CLI definitions and available subcommands.
 - src/utils/themes.rs: Reads `~/.cache/wal/walrusfox.json` (or `WALRUSFOX_COLORS`) to extract colors and wallpaper.
+- src/utils/logging.rs: Shared logging initialization for both binaries.
 
 ## Logging
 

@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum BrowserAction {
+pub enum BrowserAction {
     Version,
     Colors,
     ThemeMode,
@@ -17,7 +17,7 @@ const CMD_LIGHT_STR: &str = "light";
 const CMD_INVALID_STR: &str = "invalid";
 
 impl BrowserAction {
-    pub(crate) fn value(&self) -> &str {
+    pub fn value(&self) -> &str {
         match self {
             BrowserAction::Version => ACTN_VERSION_STR,
             BrowserAction::Colors => ACTN_COLORS_STR,
@@ -40,7 +40,7 @@ impl std::str::FromStr for BrowserAction {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum SocketCommand {
+pub enum SocketCommand {
     Update,
     Auto,
     Dark,
@@ -49,7 +49,7 @@ pub(crate) enum SocketCommand {
 }
 
 impl SocketCommand {
-    pub(crate) fn value(&self) -> &str {
+    pub fn value(&self) -> &str {
         match self {
             SocketCommand::Update => CMD_UPDATE_STR,
             SocketCommand::Auto => CMD_AUTO_STR,

@@ -1,3 +1,4 @@
-pub(crate) mod cli;
+pub mod cli;
 
-pub(crate) mod themes;
+pub mod logging;
+pub mod themes;

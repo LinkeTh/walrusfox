@@ -19,16 +19,16 @@ use std::thread;
 use std::time::Duration;
 use tracing::{debug, error, info, warn};
 
-pub(crate) struct Bridge<'a> {
+pub struct Bridge<'a> {
     config: &'a Config,
 }
 
 impl<'a> Bridge<'a> {
-    pub(crate) fn new(config: &'a Config) -> Self {
+    pub fn new(config: &'a Config) -> Self {
         Self { config }
     }
 
-    pub(crate) fn run(&self) -> Result<()> {
+    pub fn run(&self) -> Result<()> {
         let shutdown = Arc::new(AtomicBool::new(false));
         let shutdown_socket = shutdown.clone();
         let socket = self.config.socket_path.clone();

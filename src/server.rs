@@ -8,20 +8,20 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use tracing::{info, warn};
 
-pub(crate) struct Server<'a> {
+pub struct Server<'a> {
     clients: Arc<Mutex<HashMap<u64, Arc<Mutex<UnixStream>>>>>,
     config: &'a Config,
 }
 
 impl<'a> Server<'a> {
-    pub(crate) fn new(config: &'a Config) -> Self {
+    pub fn new(config: &'a Config) -> Self {
         Self {
             clients: Arc::new(Mutex::new(HashMap::new())),
             config,
         }
     }
 
-    pub(crate) fn init(&self) -> anyhow::Result<()> {
+    pub fn init(&self) -> anyhow::Result<()> {
         let path = self.config.socket_path.clone();
 
         let listener = UnixListener::bind(&path)?;

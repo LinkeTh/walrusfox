@@ -1,2 +1,2 @@
-pub(crate) mod events;
-pub(crate) mod native_messaging;
+pub mod events;
+pub mod native_messaging;

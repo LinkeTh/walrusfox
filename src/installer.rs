@@ -2,10 +2,7 @@ use crate::config::{ALLOWED_EXTENSION, HOST_NAME};
 use anyhow::{Context, Result};
 use directories::BaseDirs;
 use std::fs;
-use std::fs::{set_permissions, Permissions};
-use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
-use tracing::warn;
 
 #[derive(serde::Serialize)]
 struct Manifest<'a> {
@@ -16,26 +13,30 @@ struct Manifest<'a> {
     allowed_extensions: [&'a str; 1],
 }
 
-pub(crate) struct Installer {}
+pub struct Installer {}
+
+impl Default for Installer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl Installer {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {}
     }
 
-    pub(crate) fn install(&self) -> Result<()> {
+    pub fn install(&self) -> Result<()> {
         Self::install_systemd_user_unit()?;
-        Self::install_extension_script()?;
         Self::install_manifest()
     }
 
-    pub(crate) fn uninstall(&self) -> Result<()> {
+    pub fn uninstall(&self) -> Result<()> {
         Self::uninstall_systemd_user_unit()?;
-        Self::uninstall_extension_script()?;
         Self::uninstall_manifest()
     }
 
-    pub(crate) fn print_manifest(&self) -> Result<()> {
+    pub fn print_manifest(&self) -> Result<()> {
         let manifest = Self::build_manifest();
         let data = serde_json::to_string_pretty(&manifest)?;
         println!("{}", data);
@@ -59,11 +60,12 @@ impl Installer {
     }
 
     fn build_manifest() -> Manifest<'static> {
-        let path = Self::script_path();
+        let path = std::env::current_exe().expect("resolve current exe path");
+        let bin = format!("{}-ext", path.display());
         Manifest {
             name: HOST_NAME,
             description: "Automatically theme your browser using external colors",
-            path: path.to_string_lossy().to_string(),
+            path: bin,
             r#type: "stdio",
             allowed_extensions: [ALLOWED_EXTENSION],
         }
@@ -98,29 +100,9 @@ impl Installer {
         let base = BaseDirs::new().expect("xdg base").home_dir().to_path_buf();
         base.join(".config").join("systemd").join("user")
     }
-    fn script_path() -> PathBuf {
-        Self::mozilla_native_hosts_dir_user().join("walrusfox.sh")
-    }
 
     fn systemd_unit_path() -> PathBuf {
         Self::systemd_user_unit_dir().join("walrusfox.service")
-    }
-
-    fn install_extension_script() -> Result<()> {
-        let bin = std::env::current_exe().context("resolve current exe path")?;
-        let content = format!("#!/usr/bin/env bash\n{} connect", bin.display());
-        let unit_path = Self::script_path();
-
-        fs::write(&unit_path, content)
-            .with_context(|| format!("writing {}", unit_path.display()))?;
-        if let Err(e) = set_permissions(&unit_path, Permissions::from_mode(0o755)) {
-            warn!("Failed to set script permissions to 0755: {}", e);
-        }
-        println!(
-            "Installed extension entry point script at {}",
-            unit_path.display()
-        );
-        Ok(())
     }
 
     fn install_systemd_user_unit() -> Result<()> {
@@ -150,18 +132,7 @@ WantedBy=default.target
         println!("Hint: enable it with: systemctl --user enable --now walrusfox.service");
         Ok(())
     }
-    fn uninstall_extension_script() -> Result<()> {
-        let unit_path = Self::script_path();
-        if unit_path.exists() {
-            fs::remove_file(&unit_path)
-                .with_context(|| format!("removing {}", unit_path.display()))?;
-            println!(
-                "Removed extension entry point script {}",
-                unit_path.display()
-            );
-        }
-        Ok(())
-    }
+
     fn uninstall_systemd_user_unit() -> Result<()> {
         let unit_path = Self::systemd_unit_path();
         if unit_path.exists() {

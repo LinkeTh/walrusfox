@@ -6,32 +6,32 @@ use std::io::Write;
 use std::os::unix::fs::PermissionsExt;
 use std::os::unix::net::UnixStream;
 
-pub(crate) struct Client<'a> {
+pub struct Client<'a> {
     config: &'a Config,
 }
 
 impl<'a> Client<'a> {
-    pub(crate) fn new(config: &'a Config) -> Self {
+    pub fn new(config: &'a Config) -> Self {
         Self { config }
     }
 
-    pub(crate) fn update(&self) -> anyhow::Result<()> {
+    pub fn update(&self) -> Result<()> {
         self.send_command("update")
     }
 
-    pub(crate) fn handle_dark(&self) -> anyhow::Result<()> {
+    pub fn handle_dark(&self) -> Result<()> {
         self.send_command("dark")
     }
 
-    pub(crate) fn handle_light(&self) -> anyhow::Result<()> {
+    pub fn handle_light(&self) -> Result<()> {
         self.send_command("light")
     }
 
-    pub(crate) fn handle_auto(&self) -> anyhow::Result<()> {
+    pub fn handle_auto(&self) -> Result<()> {
         self.send_command("auto")
     }
 
-    pub(crate) fn health(&self) -> Result<()> {
+    pub fn health(&self) -> Result<()> {
         let socket = self.config.socket_path.clone();
         match UnixStream::connect(&socket) {
             Ok(_) => {
@@ -44,7 +44,7 @@ impl<'a> Client<'a> {
         }
     }
 
-    pub(crate) fn diagnose(&self) -> Result<()> {
+    pub fn diagnose(&self) -> Result<()> {
         println!("walrusfox diagnostics");
         println!("Version: {}", env!("CARGO_PKG_VERSION"));
 
@@ -107,7 +107,7 @@ impl<'a> Client<'a> {
         Ok(())
     }
 
-    fn send_command(&self, cmd: &str) -> anyhow::Result<()> {
+    fn send_command(&self, cmd: &str) -> Result<()> {
         let socket = self.config.socket_path.clone();
         let mut stream = match UnixStream::connect(&socket) {
             Ok(s) => s,

@@ -6,20 +6,19 @@ use std::os::unix::fs::DirBuilderExt;
 use std::path::{Path, PathBuf};
 use tracing::warn;
 
-pub(crate) const HOST_NAME: &str = "pywalfox"; // keep the same host name used by the Python implementation
-pub(crate) const ALLOWED_EXTENSION: &str = "pywalfox@frewacom.org"; // Firefox add-on id
+pub const HOST_NAME: &str = "pywalfox"; // keep the same host name used by the Python implementation
+pub const ALLOWED_EXTENSION: &str = "pywalfox@frewacom.org"; // Firefox add-on id
 
 #[derive(Debug, Default, Deserialize, Clone)]
-pub(crate) struct Config {
-    pub(crate) socket_path: PathBuf,
-    pub(crate) log_file: PathBuf,
+pub struct Config {
+    pub socket_path: PathBuf,
+    pub log_file: PathBuf,
 }
 
 impl Config {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         let socket_path = Self::socket_path();
         let log_file = Self::log_file_path();
-
         Self {
             socket_path,
             log_file,

@@ -7,12 +7,12 @@ use std::io::{self, stdin, Read, Write};
 use tracing::{error, info, warn};
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct Request {
-    pub(crate) action: String,
+pub struct Request {
+    pub action: String,
 }
 
 #[derive(Debug, Serialize)]
-pub(crate) struct Response<T> {
+pub struct Response<T> {
     action: String,
     success: bool,
     error: Option<String>,
@@ -20,16 +20,16 @@ pub(crate) struct Response<T> {
 }
 
 #[derive(Debug, Serialize)]
-pub(crate) struct ColorData {
+pub struct ColorData {
     colors: Vec<String>,
     wallpaper: Option<String>,
 }
 
-pub(crate) fn read_message<T: DeserializeOwned + std::fmt::Debug>() -> Result<Option<T>> {
+pub fn read_message<T: DeserializeOwned + std::fmt::Debug>() -> Result<Option<T>> {
     let mut len_buf = [0u8; 4];
     if stdin().read_exact(&mut len_buf).is_err() {
         // EOF or no more input from browser; treat as graceful shutdown
-        tracing::warn!("native messaging: EOF while reading message length");
+        warn!("native messaging: EOF while reading message length");
         return Ok(None);
     }
     let len = u32::from_le_bytes(len_buf) as usize;
@@ -50,17 +50,17 @@ pub(crate) fn read_message<T: DeserializeOwned + std::fmt::Debug>() -> Result<Op
     Ok(Some(value))
 }
 
-pub(crate) fn encode_message<T: Serialize>(value: &T) -> Result<Vec<u8>> {
+pub fn encode_message<T: Serialize>(value: &T) -> Result<Vec<u8>> {
     let data = serde_json::to_vec(value).context("serialize json")?;
     Ok(data)
 }
 
-pub(crate) fn decode_message<T: DeserializeOwned>(bytes: &[u8]) -> Result<T> {
+pub fn decode_message<T: DeserializeOwned>(bytes: &[u8]) -> Result<T> {
     let value = serde_json::from_slice::<T>(bytes).context("parsing json")?;
     Ok(value)
 }
 
-pub(crate) fn send_version() -> Result<()> {
+pub fn send_version() -> Result<()> {
     let response = Response {
         action: BrowserAction::Version.value().to_string(),
         success: true,
@@ -71,7 +71,7 @@ pub(crate) fn send_version() -> Result<()> {
     write_message(&response)
 }
 
-pub(crate) fn send_colors() -> Result<()> {
+pub fn send_colors() -> Result<()> {
     match themes::read_colors() {
         Ok(colors) => {
             let response = Response {
@@ -94,7 +94,7 @@ pub(crate) fn send_colors() -> Result<()> {
     }
 }
 
-pub(crate) fn send_theme_mode(mode: &str) -> Result<()> {
+pub fn send_theme_mode(mode: &str) -> Result<()> {
     let response = Response {
         action: BrowserAction::ThemeMode.value().to_string(),
         success: true,
@@ -105,7 +105,7 @@ pub(crate) fn send_theme_mode(mode: &str) -> Result<()> {
     write_message(&response)
 }
 
-pub(crate) fn send_invalid_response() -> Result<()> {
+pub fn send_invalid_response() -> Result<()> {
     let response = build_invalid_response();
     info!("Sending =>  {:?}", response);
     write_message(&response)

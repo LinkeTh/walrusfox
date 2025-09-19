@@ -4,8 +4,16 @@ version = "2.7.4"
 edition = "2021"
 authors = ["Pywalfox Contributors", "linket@ymail.com"]
 description = "Linux-only Rust native messaging host for Pywalfox Extension (Firefox)"
-license = "MIT"
+license = "Mozilla Public License, version 2.0"
 rust-version = "1.89.0"
+
+[[bin]]
+name = "walrusfox"
+path = "src/bin/walrusfox.rs"
+
+[[bin]]
+name = "walrusfox-ext"
+path = "src/bin/walrusfox_ext.rs"
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
