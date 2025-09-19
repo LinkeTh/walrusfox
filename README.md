@@ -78,11 +78,11 @@ Host binary (walrusfox-ext):
 
 Notes:
 
-- In normal usage, Firefox launches the native host according to the manifest. You should keep the server running (e.g., via a systemd user service)
-  so CLI commands can be delivered to the extension client.
+- In normal usage, Firefox launches the native host according to the manifest, this will be enough to get the current colors.
+- You should keep the server running (e.g., via a systemd user service) so CLI commands can be delivered to the extension client. Running the server
+  is optional, you need it if you want to send commands (like 'update') from another script (wallpaper changer for example)
 - `install` creates the following in your home directory:
-    - Native messaging manifest at `~/.mozilla/native-messaging-hosts/pywalfox.json` (host name kept for compatibility).
-    - A small launcher script at `~/.mozilla/native-messaging-hosts/walrusfox.sh` used as the manifest's entry point.
+    - Native messaging manifest at `~/.mozilla/native-messaging-hosts/pywalfox.json` (host name kept for compatibility with the Firefox extension).
     - A systemd user unit at `~/.config/systemd/user/walrusfox.service` that runs the server; enable it with
       `systemctl --user enable --now walrusfox.service`.
 
