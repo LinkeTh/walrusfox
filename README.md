@@ -146,7 +146,7 @@ Example theme mode response (when a CLI command is received via the socket):
 
 - Controlled by `RUST_LOG` env (e.g., `RUST_LOG=info` or `RUST_LOG=walrusfox=debug`).
 - Destination: if `WALRUSFOX_LOG` is set, logs go to that file; otherwise we try the XDG state directory (e.g.,
-  `$XDG_STATE_HOME/de/linket/walrusfox/walrusfox.log`). If that’s unavailable, logs fall back to `/tmp/walrusfox.log`.
+  `$XDG_STATE_HOME/walrusfox/walrusfox.log`). If that’s unavailable, logs fall back to `/tmp/walrusfox.log`.
 
 ## Paths and configuration
 
