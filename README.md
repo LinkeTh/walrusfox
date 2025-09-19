@@ -8,7 +8,7 @@ Original project: https://github.com/Frewacom/pywalfox
 
 - This is a rust rewrite of the original Python version, just for fun (and because I dont like Python)
 - Not all features are implemented yet (setting color and theme mode works).
-- Only works on linux (tested with Firefox and Thunderbird on Ubuntu 24.04 lts)
+- Only works on linux (tested with Firefox and Thunderbird - only Debian .deb supported - on Ubuntu 24.04 lts)
 - Use wallust https://codeberg.org/explosion-mental/wallust to create colorscheme files
 - It needs the pywalfox Firefox extension to work https://addons.mozilla.org/en-US/firefox/addon/pywalfox/
 
