@@ -39,6 +39,14 @@ impl<'a> Bridge<'a> {
                 }
             });
 
+        Self::native_messaging_loop()?;
+
+        warn!("Stdin closed; initiating graceful shutdown");
+        shutdown.store(true, Ordering::SeqCst);
+        Ok(())
+    }
+
+    fn native_messaging_loop() -> Result<()> {
         while let Some(msg) = read_message::<Request>()? {
             match msg.action.parse::<BrowserAction>() {
                 Ok(action) => {
@@ -56,9 +64,6 @@ impl<'a> Bridge<'a> {
                 }
             }
         }
-
-        warn!("Stdin closed; initiating graceful shutdown");
-        shutdown.store(true, Ordering::SeqCst);
         Ok(())
     }
 
