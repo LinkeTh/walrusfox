@@ -21,7 +21,6 @@ fn main() {
 }
 
 fn real_main(cli: Cli, config: Config) -> Result<()> {
-    info!("Enter walrusfox {:?}", cli);
     match cli.command {
         Commands::Install => installer::Installer::new().install()?,
         Commands::Uninstall => installer::Installer::new().uninstall()?,
@@ -34,6 +33,5 @@ fn real_main(cli: Cli, config: Config) -> Result<()> {
         Commands::Diagnose => client::Client::new(&config).diagnose()?,
         Commands::PrintManifest => installer::Installer::new().print_manifest()?,
     }
-    info!("Exit walrusfox");
     Ok(())
 }
