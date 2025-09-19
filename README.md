@@ -19,14 +19,15 @@ Original project: https://github.com/Frewacom/pywalfox
 
 Components in this repo (split binaries):
 
-- walrusfox-ext: Firefox/Thunderbird native messaging host (stdin/stdout) that talks to the browser.
+- walrusfox-ext: Firefox/Thunderbird native messaging host (stdin/stdout). It also auto-starts the local Unix socket server on-demand if none is running.
 - walrusfox: CLI and local Unix socket server to accept control commands.
 - Shared library code under src/lib.rs used by both binaries.
 
 Data flow:
 
 1. The server binds a Unix domain socket at `$XDG_RUNTIME_DIR/walrusfox/walrusfox.sock` (or `/tmp/walrusfox.sock` as a fallback) and relays any line
-   received from one client to all other connected clients.
+   received from one client to all other connected clients. If the server isn’t running when the browser starts the native host, `walrusfox-ext` will
+   start it automatically (embedded in the native host process).
 2. The extension client connects to that socket and listens for commands (update, dark, light, auto). When it receives one, it emits the appropriate
    native message back to Firefox via stdout.
 3. The native host also listens for requests from the browser (e.g., `debug:version` and `action:colors`) and returns responses, including current
@@ -79,13 +80,18 @@ Host binary (walrusfox-ext):
 
 Notes:
 
-- In normal usage, Firefox launches the native host according to the manifest, this will be enough to get the current colors.
-- You should keep the server running (e.g., via a systemd user service) so CLI commands can be delivered to the extension client. Running the server
-  is optional, you need it if you want to send commands (like 'update') from another script (wallpaper changer for example)
+- In normal usage, Firefox launches the native host according to the manifest; this is enough to retrieve and send colors to the browser.
+- The native host now auto-starts the socket server on-demand. The server will run for as long as the native host stays alive (i.e., while the
+  browser extension keeps the native messaging port open).
+- If you need the server to be available even when the browser/extension isn’t connected (so that CLI commands from external scripts can be sent at
+  any time), run `walrusfox start` yourself (e.g., under a systemd user service you manage). The installer does not set up any systemd unit.
 - `install` creates the following in your home directory:
     - Native messaging manifest at `~/.mozilla/native-messaging-hosts/pywalfox.json` (host name kept for compatibility with the Firefox extension).
-    - A systemd user unit at `~/.config/systemd/user/walrusfox.service` that runs the server; enable it with
-      `systemctl --user enable --now walrusfox.service`.
+
+### Embedded server lifecycle
+- walrusfox-ext starts an embedded Unix socket server when no server is listening on the configured socket path.
+- The embedded server runs within the native host process; it will shut down automatically when the browser closes the native messaging port (e.g., on browser shutdown or when the extension port is closed).
+- If you require a long-lived server, start it explicitly via `walrusfox start` (optionally as a systemd user service).
 
 ## Native message schema (current)
 
@@ -128,7 +134,7 @@ Example theme mode response (when a CLI command is received via the socket):
 - src/bridge.rs: Connects native messaging to the Unix socket; handles browser requests and socket commands.
 - src/client.rs: CLI client for sending single commands to the socket, plus health/diagnose helpers.
 - src/server.rs: Unix domain socket server that broadcasts line-based commands to all connected clients except the sender.
-- src/installer.rs: Install/uninstall the Firefox native messaging manifest and helper files (systemd unit, launcher script).
+- src/installer.rs: Install/uninstall the Firefox native messaging manifest.
 - src/config.rs: Constants and filesystem paths (host name, allowed extension ID, socket path, log path).
 - src/protocol/events.rs: Action and command enums and parsing.
 - src/protocol/native_messaging.rs: Helpers to encode/decode Native Messaging frames and build responses.
