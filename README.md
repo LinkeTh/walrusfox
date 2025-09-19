@@ -6,10 +6,11 @@ helper processes via a Unix domain socket.
 
 Original project: https://github.com/Frewacom/pywalfox
 
-- This is a rust rewrite of the original Python version, just for fun (and because I dont like Python)
+- This is a rust rewrite of the original Python version, just for fun (and because I dont like Python - at least on Ubuntu 24+ with all that venv
+  hustle)
 - Not all features are implemented yet (setting color and theme mode works).
 - Only works on linux (tested with Firefox and Thunderbird - only Debian .deb supported - on Ubuntu 24.04 lts)
-- Use wallust https://codeberg.org/explosion-mental/wallust to create colorscheme files
+- Use wallust https://codeberg.org/explosion-mental/wallust or pywal https://github.com/dylanaraps/pywal to create colorscheme files
 - It needs the pywalfox Firefox extension to work https://addons.mozilla.org/en-US/firefox/addon/pywalfox/
 
 ![](walrusfox.png)
@@ -149,8 +150,8 @@ Example theme mode response (when a CLI command is received via the socket):
     3) `/tmp/walrusfox.sock` (fallback)
 - Log file path resolution precedence:
     1) `WALRUSFOX_LOG`
-    2) XDG state dir as above
-    3) `/tmp/walrusfox.log` fallback
+    2) `$HOME/.local/state/walrusfox/walrusfox.log`
+    3) `/tmp/walrusfox.log` (fallback)
 
 ## Limitations
 
