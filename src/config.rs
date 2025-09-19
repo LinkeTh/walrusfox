@@ -61,7 +61,7 @@ impl Config {
         builder.recursive(true);
         builder.mode(0o700);
         if let Err(e) = builder.create(dir) {
-            warn!("failed to create directory {}: {}", dir.display(), e);
+            warn!("Failed to create directory {}: {}", dir.display(), e);
         }
     }
 }

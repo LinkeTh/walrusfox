@@ -1,7 +1,7 @@
 use crate::config::MAX_MSG_LEN;
 use crate::protocol::events::BrowserAction;
 use crate::utils::themes;
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::io::{self, stdin, Read, Write};
@@ -30,13 +30,13 @@ pub fn read_message<T: DeserializeOwned + std::fmt::Debug>() -> Result<Option<T>
     let mut len_buf = [0u8; 4];
     if stdin().read_exact(&mut len_buf).is_err() {
         // EOF or no more input from browser; treat as graceful shutdown
-        warn!("native messaging: EOF while reading message length");
+        warn!("Native messaging: EOF while reading message length");
         return Ok(None);
     }
     let len = u32::from_le_bytes(len_buf) as usize;
     if len == 0 || len > MAX_MSG_LEN {
-        anyhow::bail!(
-            "native messaging: invalid length {} (max {})",
+        bail!(
+            "Native messaging: invalid length {} (max {})",
             len,
             MAX_MSG_LEN
         );
@@ -44,18 +44,18 @@ pub fn read_message<T: DeserializeOwned + std::fmt::Debug>() -> Result<Option<T>
     let mut data = vec![0u8; len];
     stdin()
         .read_exact(&mut data)
-        .context("reading native message body")?;
+        .context("Reading native message body")?;
     let value = decode_message::<T>(&data)?;
     Ok(Some(value))
 }
 
 pub fn encode_message<T: Serialize>(value: &T) -> Result<Vec<u8>> {
-    let data = serde_json::to_vec(value).context("serialize json")?;
+    let data = serde_json::to_vec(value).context("Serialize json")?;
     Ok(data)
 }
 
 pub fn decode_message<T: DeserializeOwned>(bytes: &[u8]) -> Result<T> {
-    let value = serde_json::from_slice::<T>(bytes).context("parsing json")?;
+    let value = serde_json::from_slice::<T>(bytes).context("Parsing json")?;
     Ok(value)
 }
 
@@ -114,14 +114,9 @@ fn write_message<T: Serialize>(value: &T) -> Result<()> {
     let data = encode_message(value)?;
     let len = data.len() as u32;
     let mut out = io::stdout();
-    out.write_all(&len.to_le_bytes()).context("write len")?;
-    out.write_all(&data).context("write body")?;
-    out.flush()
-        .map_err(|e| {
-            warn!("native messaging: flush failed: {}", e);
-            e
-        })
-        .context("flush stdout")?;
+    out.write_all(&len.to_le_bytes()).context("Write len")?;
+    out.write_all(&data).context("Write body")?;
+    out.flush().context("Flush stdout")?;
     Ok(())
 }
 

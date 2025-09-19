@@ -75,7 +75,7 @@ impl<'a> Server<'a> {
                     if let Err(e) = thread::Builder::new().name(name).spawn(move || {
                         Self::handle_client(id, client, clients_clone);
                     }) {
-                        warn!("failed to spawn client handler thread for {}: {}", id, e);
+                        warn!("Failed to spawn client handler thread for {}: {}", id, e);
                     }
                 }
                 Err(err) => {
@@ -128,11 +128,11 @@ impl<'a> Server<'a> {
         msg.extend_from_slice(cmd.as_bytes());
         msg.push(b'\n');
         if let Err(e) = writer.write_all(&msg) {
-            warn!("broadcast write error to recipient {}: {}", client_id, e);
+            warn!("Broadcast write error to recipient {}: {}", client_id, e);
             return true;
         }
         if let Err(e) = writer.flush() {
-            warn!("broadcast flush error to recipient {}: {}", client_id, e);
+            warn!("Broadcast flush error to recipient {}: {}", client_id, e);
         }
         false
     }
@@ -151,7 +151,7 @@ impl<'a> Server<'a> {
             match s.try_clone() {
                 Ok(cloned) => cloned,
                 Err(e) => {
-                    warn!("client {}: failed to clone stream: {}", client_id, e);
+                    warn!("Client {}: failed to clone stream: {}", client_id, e);
                     return None;
                 }
             }

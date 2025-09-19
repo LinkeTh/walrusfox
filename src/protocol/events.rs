@@ -39,6 +39,7 @@ impl std::str::FromStr for BrowserAction {
         })
     }
 }
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SocketCommand {
     Update,

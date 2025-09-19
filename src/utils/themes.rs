@@ -15,18 +15,18 @@ pub fn read_colors() -> Result<(Vec<String>, Option<String>)> {
     let data = match fs::read_to_string(&path) {
         Ok(d) => d,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            bail!("color definition not found at {}", path.display());
+            bail!("Color definition not found at {}", path.display());
         }
-        Err(e) => return Err(e).with_context(|| format!("reading {}", path.display())),
+        Err(e) => return Err(e).with_context(|| format!("Reading {}", path.display())),
     };
-    let parsed: ColorFile = serde_json::from_str(&data).context("json parse color definition")?;
+    let parsed: ColorFile = serde_json::from_str(&data).context("Json parse color definition")?;
 
     if parsed.colors.len() < 16 {
-        warn!("color definition contains fewer than 16 colors");
+        warn!("Color definition contains fewer than 16 colors");
     }
 
     info!(
-        "loaded {} colors from {}",
+        "Loaded {} colors from {}",
         parsed.colors.len(),
         path.display()
     );

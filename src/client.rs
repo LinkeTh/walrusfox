@@ -1,4 +1,5 @@
 use crate::config::Config;
+use crate::protocol::events::SocketCommand;
 use crate::utils::themes;
 use anyhow::Result;
 use std::fs;
@@ -16,19 +17,19 @@ impl<'a> Client<'a> {
     }
 
     pub fn update(&self) -> Result<()> {
-        self.send_command("update")
+        self.send_command(SocketCommand::Update.value())
     }
 
     pub fn handle_dark(&self) -> Result<()> {
-        self.send_command("dark")
+        self.send_command(SocketCommand::Dark.value())
     }
 
     pub fn handle_light(&self) -> Result<()> {
-        self.send_command("light")
+        self.send_command(SocketCommand::Light.value())
     }
 
     pub fn handle_auto(&self) -> Result<()> {
-        self.send_command("auto")
+        self.send_command(SocketCommand::Auto.value())
     }
 
     pub fn health(&self) -> Result<()> {
@@ -45,7 +46,7 @@ impl<'a> Client<'a> {
     }
 
     pub fn diagnose(&self) -> Result<()> {
-        println!("walrusfox diagnostics");
+        println!("### walrusfox diagnostics");
         println!("Version: {}", env!("CARGO_PKG_VERSION"));
 
         // Socket

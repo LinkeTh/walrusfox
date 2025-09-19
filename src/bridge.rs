@@ -43,22 +43,21 @@ impl<'a> Bridge<'a> {
             match msg.action.parse::<BrowserAction>() {
                 Ok(action) => {
                     if let BrowserAction::Invalid = action {
-                        // Unknown action from browser
-                        warn!("browser sent invalid action: {}", msg.action);
+                        warn!("Browser sent invalid action: {}", msg.action);
                         send_invalid_response()?;
                         continue;
                     }
                     Self::handle_browser_request(action)?;
                 }
                 Err(_) => {
-                    warn!("failed to parse browser action: {}", msg.action);
+                    warn!("Failed to parse browser action: {}", msg.action);
                     send_invalid_response()?;
                     continue;
                 }
             }
         }
 
-        warn!("stdin closed; initiating graceful shutdown");
+        warn!("Stdin closed; initiating graceful shutdown");
         shutdown.store(true, Ordering::SeqCst);
         Ok(())
     }
@@ -114,7 +113,7 @@ impl<'a> Bridge<'a> {
                 }
                 Err(e) => {
                     return Err(anyhow::anyhow!(e))
-                        .with_context(|| "reading from Unix socket".to_string());
+                        .with_context(|| "Reading from Unix socket".to_string());
                 }
             }
         }

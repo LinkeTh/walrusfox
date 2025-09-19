@@ -15,8 +15,8 @@ fn main() {
     match Cli::try_parse() {
         Ok(cli) => {
             if let Err(e) = run(cli, config) {
-                error!("error: {e}");
-                eprintln!("error: {e}");
+                error!("Error: {e}");
+                eprintln!("Error: {e}");
                 std::process::exit(1);
             }
         }

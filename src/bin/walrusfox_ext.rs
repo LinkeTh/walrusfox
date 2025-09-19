@@ -13,18 +13,18 @@ fn main() {
 
     // Firefox passes [manifest_path, extension_id]
     let argv: Vec<OsString> = env::args_os().collect();
-    info!("native host binary called with : {:?}", argv);
+    info!("Called with : {:?}", argv);
     if argv.len() >= 3 {
         let caller = argv[2].to_string_lossy().to_string();
         if caller != ALLOWED_EXTENSION {
-            warn!("blocked origin: {}", caller);
+            warn!("Blocked origin: {}", caller);
             std::process::exit(1);
         }
     }
     maybe_spawn_server(&config);
     if let Err(e) = Bridge::new(&config).run() {
-        error!("host error: {e}");
-        eprintln!("host error: {e}");
+        error!("Host error: {e}");
+        eprintln!("Host error: {e}");
         std::process::exit(1);
     }
 
@@ -38,7 +38,7 @@ fn main() {
             .name("walrusfox-embedded-server".to_string())
             .spawn(move || {
                 if let Err(e) = Server::new(&config).init() {
-                    warn!("embedded server failed to start: {}", e);
+                    warn!("Embedded server failed to start: {}", e);
                 }
             });
     }
