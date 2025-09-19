@@ -1,4 +1,6 @@
-use tracing::{error, warn};
+use std::env;
+use std::ffi::OsString;
+use tracing::{error, info, warn};
 use walrusfox::bridge::Bridge;
 use walrusfox::config::{Config, ALLOWED_EXTENSION};
 use walrusfox::utils::logging::init_logging;
@@ -8,13 +10,14 @@ fn main() {
     let _guard = init_logging(&config);
 
     // Firefox passes [manifest_path, extension_id]
-    let argv: Vec<std::ffi::OsString> = std::env::args_os().collect();
+    let argv: Vec<OsString> = env::args_os().collect();
+    info!("native host binary called with : {:?}", argv);
     if argv.len() >= 3 {
         let caller = argv[2].to_string_lossy().to_string();
         if caller != ALLOWED_EXTENSION {
             // Log and exit quietly; stdout must stay clean
             warn!("blocked origin: {}", caller);
-            std::process::exit(0);
+            std::process::exit(1);
         }
     }
 
