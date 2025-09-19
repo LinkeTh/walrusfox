@@ -166,6 +166,6 @@ mod tests {
         let bad = b"not json";
         let err = decode_message::<T>(bad).unwrap_err();
         let s = format!("{}", err);
-        assert!(s.contains("parsing json"));
+        assert!(s.contains("Parsing json"));
     }
 }

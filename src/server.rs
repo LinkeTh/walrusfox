@@ -164,7 +164,7 @@ impl<'a> Server<'a> {
         let targets: Vec<(u64, Arc<Client>)> = {
             let map = clients.lock();
             map.iter()
-                .filter(|(rid, _c)| (**rid != client_id))
+                .filter(|(rid, _c)| **rid != client_id)
                 .map(|(rid, c)| (*rid, c.clone()))
                 .collect()
         };
